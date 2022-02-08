@@ -1,18 +1,19 @@
 import express from "express";
-import { createLeadsById, getAllLeads, deleteLead, updateLeadsById, getAdmins } from "../helper.js";
+import { getAllRequests, createRequestById, deleteRequest, updateRequestsById, getAdmins } from "../helper.js";
 import sgMail from "@sendgrid/mail"
 
 const router = express.Router();
 
 router.route("/").get(async (request, response) => {
 
-    const leadsList = await getAllLeads();
+    const leadsList = await getAllRequests();
     response.send(leadsList);
 }).post(async (request, response) => {
     const data = request.body;
     console.log(data)
-    const result = await createLeadsById(data);
+    const result = await createRequestById(data);
     const getUsers = await getAdmins()
+
     const email = getUsers.map(user => user.email)
     if (email) {
         sgMail.setApiKey(process.env.SENDGRID_API_KEY)          //sendGrid package for sending email messages
@@ -22,12 +23,11 @@ router.route("/").get(async (request, response) => {
                 name: "CRM",
                 email: process.env.ACC_EMAIL
             },
-            subject: "New Lead has been created",
-            html: `<h2>Below is the new Lead generated from our end.</h2>
+            subject: "New new Service Request has been created",
+            html: `<h2>Below is the new Service Request generated from our end.</h2>
             <p>Name: ${data.name}</p>
             <p>Email: ${data.email}</p>
-            <p>Contact: ${data.contact}</p>
-            <p>Company: ${data.company}</p>
+            <p>Contact: ${data.request}</p>
             <p>Status: ${data.status}</p>            
             `
         }
@@ -39,13 +39,13 @@ router.route("/").get(async (request, response) => {
 router.route("/:id").delete(async (request, response) => {
     const { id } = request.params
     console.log(id)
-    const result = await deleteLead(id);
+    const result = await deleteRequest(id);
     response.send(result);
 }).put(async (request, response) => {
     const { id } = request.params;
     const { status } = request.body;
     try {
-        const result = await updateLeadsById(id, status)
+        const result = await updateRequestsById(id, status)
         console.log(result);
         response.send(result);
     }
@@ -55,4 +55,4 @@ router.route("/:id").delete(async (request, response) => {
 
 })
 
-export const leadsRouter = router;
+export const serviceRequestRouter = router;
