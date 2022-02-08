@@ -13,15 +13,18 @@ router.route('/').put(async (req, res) => {
             if (err) {
                 return res.send({ message: "Incorrect token or it is expired!" })
             }
-            const existUser = await client.db("crm").collection("users").findOne({ resetLink: resetLink })
-            if (!existUser) {
+            const existUser = await client.db("crm").collection("users").findOne({ resetLink: resetLink })      //to find the user
+            if (!existUser) {                                                                                   //return if user doesn't exists
                 return res.status(400).send({ message: "User with this token doesn't exists." })
             }
             try {
-                const salt = await bcrypt.genSalt(10)
-                const hashedPassword = await bcrypt.hash(newPassword, salt)
-                const result = await client.db("crm").collection("users").updateOne({ resetLink: resetLink }, { $set: { password: hashedPassword, resetLink: "" } })
-                console.log(result)
+                const salt = await bcrypt.genSalt(10)                                       //generating 10 random strings
+                const hashedPassword = await bcrypt.hash(newPassword, salt)                 //password hashing
+                await client.db("crm").collection("users").updateOne(                       //update the new password
+                    { resetLink: resetLink },
+                    {
+                        $set: { password: hashedPassword, resetLink: "" }
+                    })
                 return res.status(200).send({ message: "Your password has been changed successfully!" })
             }
             catch (err) {

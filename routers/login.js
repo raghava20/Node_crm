@@ -7,16 +7,15 @@ const router = express.Router();
 
 router.route('/').post(async (req, res) => {
     const { email, password } = req.body;
-    const existUser = await client.db("crm").collection("users").findOne({ email: email });
-    console.log(existUser)
+    const existUser = await client.db("crm").collection("users").findOne({ email: email });   //to find the user
+
     if (!existUser) {
         return res.status(400).send({ message: "Cannot find user" })
     }
 
     try {
         if (await bcrypt.compare(password, existUser.password)) {
-            const token = await jwt.sign({ existUser }, process.env.SECRET_KEY, { expiresIn: 86400 })
-            console.log(token)
+            const token = await jwt.sign({ existUser }, process.env.SECRET_KEY, { expiresIn: 86400 })       //creating token
             res.status(200).send({ message: "Success", token: token })
         }
         else {

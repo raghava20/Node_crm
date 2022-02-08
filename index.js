@@ -14,13 +14,14 @@ import { auth } from "./middleware/auth.js";
 dotenv.config();
 const app = express();
 
-const PORT = process.env.PORT;
+const PORT = process.env.PORT || 3001;
 
 //--------------------------------------------------------------------------
 app.use(cors());
 app.use(express.json());
 
 //  --------------------------------------------------------------------------
+// Mongo DB connection
 const MONGO_URL = process.env.MONGO_URL;
 
 async function createConnect() {
@@ -34,16 +35,16 @@ export const client = await createConnect();
 // ------------------------------------------------------------------------------
 
 app.get("/", (request, response) => {
-
     response.send("Hello World...");
-
 })
 
+// Authentication
 app.use("/login", loginRouter)
 app.use("/sign-up", signUpRouter)
 app.use("/forgot-password", forgotPasswordRouter)
 app.use("/reset-password", resetPasswordRouter)
 
+// Authorization
 app.use("/leads", auth, leadsRouter);
 app.use("/users", auth, usersRouter);
 app.use("/service-requests", auth, serviceRequestRouter);

@@ -30,7 +30,6 @@ async function createLeadsById(data) {
     return await client.db("crm").collection("leads").insertOne(data);
 }
 async function deleteLead(data) {
-    console.log(data);
     return await client.db("crm").collection("leads").deleteOne({ _id: ObjectId(data) })
 }
 async function updateLeadsById(id, status) {
